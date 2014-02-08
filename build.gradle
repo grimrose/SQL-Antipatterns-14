@@ -1,0 +1,50 @@
+ext {
+    // 適宜変更してください
+    dbUrl = "jdbc:postgresql://localhost:5432/hoge"
+    dbUser = "fuga"
+    dbPass = "piyo"
+}
+
+
+apply plugin: "groovy"
+apply plugin: "idea"
+apply plugin: "project-report"
+
+ext {
+    spockVersion = '1.0-groovy-2.0-SNAPSHOT'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
+dependencies {
+    testCompile "org.codehaus.groovy:groovy:2.2.1"
+    testCompile "org.spockframework:spock-core:${spockVersion}"
+
+    testRuntime 'org.postgresql:postgresql:9.3-1100-jdbc41'
+
+    testCompile 'org.yaml:snakeyaml:1.13'
+
+}
+
+wrapper {
+    gradleVersion = '1.10'
+}
+
+sourceCompatibility = targetCompatibility = 1.7
+
+task createConfig {
+
+    def file = file("src/test/resources/sqlap14/config.yml")
+    file.createNewFile()
+    file.text = """
+driver: org.postgresql.Driver
+url: ${dbUrl}
+user: ${dbUser}
+password: ${dbPass}
+"""
+}
+
+test.dependsOn createConfig
